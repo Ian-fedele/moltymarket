@@ -526,24 +526,6 @@
                 const data = await res.json();
                 markets = data.markets || [];
                 
-                // If no markets from API, use defaults
-                if (markets.length === 0) {
-                    markets = getDefaultMarkets();
-                    // Save defaults to API
-                    for (const market of markets) {
-                        await fetch('/api/markets', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                question: market.question,
-                                description: market.description,
-                                endDate: new Date(market.endDate).toISOString(),
-                                type: market.type
-                            })
-                        });
-                    }
-                }
-                
                 updateStats();
             } catch (e) {
                 console.log('Using local markets (API not available)');
@@ -608,7 +590,7 @@
         
         async function vote(marketId, choice) {
             try {
-                const res = await fetch(`/api/markets/${marketId}/vote`, {
+                const res = await fetch(`/api/vote?id=${marketId}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ choice })
