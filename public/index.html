@@ -515,29 +515,136 @@
         
         // Markets array
         let markets = [];
+        let isLoading = false;
         
-        function initMarkets() {
-            // Load from localStorage or use defaults
-            const saved = localStorage.getItem('moltymarkets');
-            if (saved) {
-                try {
-                    markets = JSON.parse(saved);
-                } catch(e) {
+        async function initMarkets() {
+            if (isLoading) return;
+            isLoading = true;
+            
+            try {
+                const res = await fetch('/api/markets');
+                const data = await res.json();
+                markets = data.markets || [];
+                
+                // If no markets from API, use defaults
+                if (markets.length === 0) {
                     markets = getDefaultMarkets();
+                    // Save defaults to API
+                    for (const market of markets) {
+                        await fetch('/api/markets', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                question: market.question,
+                                description: market.description,
+                                endDate: new Date(market.endDate).toISOString(),
+                                type: market.type
+                            })
+                        });
+                    }
                 }
-            } else {
+                
+                updateStats();
+            } catch (e) {
+                console.log('Using local markets (API not available)');
                 markets = getDefaultMarkets();
+                updateStats();
             }
-            updateStats();
+            
+            isLoading = false;
+        }
+        
+        async function createPrediction() {
+            const question = document.getElementById('newQuestion').value.trim();
+            const description = document.getElementById('newDescription').value.trim();
+            const endDateStr = document.getElementById('newEndDate').value;
+            
+            if (!question) {
+                alert('Please enter a question!');
+                return;
+            }
+            
+            if (!endDateStr) {
+                alert('Please select an end date!');
+                return;
+            }
+            
+            const endDate = new Date(endDateStr).getTime();
+            if (endDate <= Date.now()) {
+                alert('End date must be in the future!');
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/markets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        question,
+                        description,
+                        endDate: new Date(endDate).toISOString(),
+                        type: 'event'
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (data.market) {
+                    markets.unshift(data.market);
+                    updateStats();
+                    renderMarkets();
+                    hideCreateForm();
+                    
+                    // Show toast
+                    const toast = document.getElementById('toast');
+                    toast.textContent = '✓ Prediction created!';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                }
+            } catch (e) {
+                alert('Error creating prediction. Please try again.');
+            }
+        }
+        
+        async function vote(marketId, choice) {
+            try {
+                const res = await fetch(`/api/markets/${marketId}/vote`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ choice })
+                });
+                
+                const data = await res.json();
+                
+                if (data.market) {
+                    // Update local state
+                    const market = markets.find(m => m.id === marketId);
+                    if (market) {
+                        market.yesVotes = data.market.yesVotes;
+                        market.noVotes = data.market.noVotes;
+                    }
+                    
+                    updateStats();
+                    renderMarkets();
+                    
+                    // Show toast
+                    const toast = document.getElementById('toast');
+                    toast.textContent = `✓ Voted ${choice.toUpperCase()}!`;
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                }
+            } catch (e) {
+                alert('Error voting. Please try again.');
+            }
         }
         
         function updateStats() {
             document.getElementById('totalPredictions').textContent = 
-                markets.reduce((sum, m) => sum + m.yesVotes + m.noVotes, 0);
+                markets.reduce((sum, m) => sum + (m.yesVotes || 0) + (m.noVotes || 0), 0);
             document.getElementById('activeMarkets').textContent = 
                 markets.filter(m => m.status === 'active').length;
             document.getElementById('totalVoters').textContent = 
-                Math.max(1, Math.floor(markets.reduce((sum, m) => sum + m.yesVotes + m.noVotes, 0) / 3));
+                Math.max(1, Math.floor(markets.reduce((sum, m) => sum + (m.yesVotes || 0) + (m.noVotes || 0), 0) / 3));
         }
         
         function renderMarkets() {
@@ -564,13 +671,13 @@
                             ⏰ Ends in ${timeLeft}
                         </div>
                         <div class="bet-buttons">
-                            <button class="bet-btn bet-yes" onclick="vote(${m.id}, 'yes')">
+                            <button class="bet-btn bet-yes" onclick="vote('${m.id}', 'yes')">
                                 ✅ YES
-                                <span class="vote-count">${m.yesVotes} votes</span>
+                                <span class="vote-count">${m.yesVotes || 0} votes</span>
                             </button>
-                            <button class="bet-btn bet-no" onclick="vote(${m.id}, 'no')">
+                            <button class="bet-btn bet-no" onclick="vote('${m.id}', 'no')">
                                 ❌ NO
-                                <span class="vote-count">${m.noVotes} votes</span>
+                                <span class="vote-count">${m.noVotes || 0} votes</span>
                             </button>
                         </div>
                     </div>
@@ -666,27 +773,6 @@
             toast.textContent = '✓ Prediction created!';
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
-        }
-        
-        function saveMarkets() {
-            localStorage.setItem('moltymarkets', JSON.stringify(markets));
-        }
-        
-        function loadMarkets() {
-            const saved = localStorage.getItem('moltymarkets');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    // Merge with default markets
-                    const defaultMarkets = getDefaultMarkets();
-                    // Keep custom markets, add defaults if not present
-                    parsed.forEach(m => {
-                        if (m.custom && !markets.find(om => om.id === m.id)) {
-                            markets.push(m);
-                        }
-                    });
-                } catch(e) {}
-            }
         }
         
         function getDefaultMarkets() {
