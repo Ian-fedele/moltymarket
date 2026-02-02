@@ -1,134 +1,111 @@
-import { kv } from '@vercel/kv';
+// Vercel Edge API for MoltyMarket
+export const config = {
+  runtime: 'edge'
+};
 
-// In-memory fallback for development
-const memoryMarkets = new Map();
+// In-memory storage for demo
+const markets = new Map([
+  ['1', { id: '1', type: 'event', question: 'Will KingMolt get banned from Moltbook this week?', description: 'Rumors are swirling...', yesVotes: 47, noVotes: 23, status: 'active', endDate: Date.now() + 86400000, createdAt: new Date().toISOString() }],
+  ['2', { id: '2', type: 'price', question: 'Will BTC hit $105k by Feb 3?', description: 'Chainlink auto-resolved', yesVotes: 156, noVotes: 89, status: 'active', endDate: Date.now() + 86400000, createdAt: new Date().toISOString() }],
+  ['3', { id: '3', type: 'event', question: 'Will Shellraiser win another agent battle?', description: 'On a winning streak...', yesVotes: 34, noVotes: 41, status: 'active', endDate: Date.now() + 172800000, createdAt: new Date().toISOString() }]
+]);
 
-export default async function handler(request, response) {
-  const { method } = request;
-
-  // CORS headers
-  response.setHeader('Access-Control-Allow-Origin', '*');
-  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+export default async function handler(request) {
+  const { method, url } = request;
+  
+  // CORS
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json'
+  };
 
   if (method === 'OPTIONS') {
-    return response.status(200).end();
+    return new Response(null, { status: 200, headers });
   }
 
-  try {
-    // GET /api/markets - Fetch all markets
-    if (method === 'GET' && (request.url === '/api/markets' || request.url.includes('/api/markets?'))) {
-      let markets;
-      try {
-        markets = await kv.get('moltymarkets');
-        if (!markets) markets = [];
-      } catch (e) {
-        // Fallback to memory if KV not connected
-        markets = Array.from(memoryMarkets.values());
-      }
-      
-      // Sort by created date
-      markets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      return response.json({ markets, count: markets.length });
-    }
-
-    // GET /api/markets/:id - Fetch single market
-    if (method === 'GET' && request.url.includes('/api/markets/')) {
-      const id = request.url.split('/api/markets/')[1].split('?')[0];
-      let market;
-      try {
-        market = await kv.hgetall(`market:${id}`);
-      } catch (e) {
-        market = memoryMarkets.get(id);
-      }
-      
-      if (!market) {
-        return response.status(404).json({ error: 'Market not found' });
-      }
-      return response.json(market);
-    }
-
-    // POST /api/markets - Create new market
-    if (method === 'POST' && request.url === '/api/markets') {
-      const { question, description, endDate, type } = request.body;
-      
-      if (!question || !endDate) {
-        return response.status(400).json({ error: 'Question and endDate required' });
-      }
-
-      const market = {
-        id: Date.now().toString(),
-        question,
-        description: description || '',
-        type: type || 'event',
-        endDate: new Date(endDate).getTime(),
-        yesVotes: 0,
-        noVotes: 0,
-        status: 'active',
-        outcome: null,
-        createdAt: new Date().toISOString()
-      };
-
-      try {
-        await kv.hset(`market:${market.id}`, market);
-        const markets = await kv.get('moltymarkets') || [];
-        markets.push(market.id);
-        await kv.set('moltymarkets', markets);
-      } catch (e) {
-        memoryMarkets.set(market.id, market);
-      }
-
-      return response.json({ market });
-    }
-
-    // POST /api/markets/:id/vote - Vote on a market
-    if (method === 'POST' && request.url.includes('/api/markets/') && request.url.includes('/vote')) {
-      const id = request.url.split('/api/markets/')[1].split('/')[0];
-      const { choice } = request.body;
-
-      if (choice !== 'yes' && choice !== 'no') {
-        return response.status(400).json({ error: 'Choice must be yes or no' });
-      }
-
-      let market;
-      try {
-        market = await kv.hgetall(`market:${id}`);
-      } catch (e) {
-        market = memoryMarkets.get(id);
-      }
-
-      if (!market) {
-        return response.status(404).json({ error: 'Market not found' });
-      }
-
-      if (choice === 'yes') market.yesVotes = (market.yesVotes || 0) + 1;
-      else market.noVotes = (market.noVotes || 0) + 1;
-
-      try {
-        await kv.hset(`market:${id}`, market);
-      } catch (e) {
-        memoryMarkets.set(id, market);
-      }
-
-      return response.json({ 
-        market,
-        totalVotes: (market.yesVotes || 0) + (market.noVotes || 0)
-      });
-    }
-
-    // GET /api/health - Health check
-    if (method === 'GET' && request.url === '/api/health') {
-      return response.json({ 
-        status: 'ok', 
-        storage: 'kv',
-        timestamp: new Date().toISOString() 
-      });
-    }
-
-    return response.status(404).json({ error: 'Not found' });
-
-  } catch (error) {
-    console.error('API Error:', error);
-    return response.status(500).json({ error: error.message });
+  // GET /api/markets
+  if (method === 'GET' && (url === '/api/markets' || url.startsWith('/api/markets?'))) {
+    const marketList = Array.from(markets.values()).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return new Response(JSON.stringify({ markets: marketList, count: marketList.length }), { headers });
   }
+
+  // GET /api/markets/:id
+  if (method === 'GET' && url.includes('/api/markets/') && !url.includes('/vote')) {
+    const id = url.split('/api/markets/')[1].split('?')[0];
+    const market = markets.get(id);
+    if (!market) {
+      return new Response(JSON.stringify({ error: 'Market not found' }), { status: 404, headers });
+    }
+    return new Response(JSON.stringify(market), { headers });
+  }
+
+  // POST /api/markets/:id/vote
+  if (method === 'POST' && url.includes('/api/markets/') && url.includes('/vote')) {
+    const id = url.split('/api/markets/')[1].split('/')[0];
+    const market = markets.get(id);
+    if (!market) {
+      return new Response(JSON.stringify({ error: 'Market not found' }), { status: 404, headers });
+    }
+
+    let choice;
+    try {
+      const body = await request.json();
+      choice = body.choice;
+    } catch (e) {
+      return new Response(JSON.stringify({ error: 'Invalid body' }), { status: 400, headers });
+    }
+
+    if (choice === 'yes') market.yesVotes = (market.yesVotes || 0) + 1;
+    else if (choice === 'no') market.noVotes = (market.noVotes || 0) + 1;
+    else {
+      return new Response(JSON.stringify({ error: 'Choice must be yes or no' }), { status: 400, headers });
+    }
+
+    markets.set(id, market);
+    return new Response(JSON.stringify({ market, totalVotes: (market.yesVotes || 0) + (market.noVotes || 0) }), { headers });
+  }
+
+  // POST /api/markets - Create market
+  if (method === 'POST' && url === '/api/markets') {
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      return new Response(JSON.stringify({ error: 'Invalid body' }), { status: 400, headers });
+    }
+
+    const { question, description, endDate, type } = body;
+    if (!question || !endDate) {
+      return new Response(JSON.stringify({ error: 'Question and endDate required' }), { status: 400, headers });
+    }
+
+    const market = {
+      id: Date.now().toString(),
+      question,
+      description: description || '',
+      type: type || 'event',
+      endDate: new Date(endDate).getTime(),
+      yesVotes: 0,
+      noVotes: 0,
+      status: 'active',
+      outcome: null,
+      createdAt: new Date().toISOString()
+    };
+
+    markets.set(market.id, market);
+    return new Response(JSON.stringify({ market }), { headers });
+  }
+
+  // GET /api/health
+  if (method === 'GET' && url === '/api/health') {
+    return new Response(JSON.stringify({ 
+      status: 'ok', 
+      markets: markets.size,
+      timestamp: new Date().toISOString() 
+    }), { headers });
+  }
+
+  return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers });
 }
