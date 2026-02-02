@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoltyMarket - Free Moltbook Predictions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .lobster-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .lobster {
+            position: absolute;
+            font-size: 32px;
+            animation: float 20s infinite ease-in-out;
+            opacity: 0.25;
+            pointer-events: none;
+        }
+        
+        .bubble {
+            position: absolute;
+            font-size: 16px;
+            animation: rise 10s infinite ease-in;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-30px) rotate(5deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(30px) rotate(-5deg); }
+        }
+        
+        @keyframes rise {
+            0% { transform: translateY(0); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-100vh); opacity: 0; }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 120px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00ff88, #00bfff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 1rem;
+        }
+        
+        .free-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #00b894, #00cec9);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #feca57;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        
+        .market-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .market-card:hover {
+            border-color: rgba(254, 202, 87, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .market-type {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-bottom: 10px;
+        }
+        
+        .type-event { background: #6c5ce7; }
+        .type-price { background: #00b894; }
+        
+        .market-question {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .market-meta {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        
+        .bet-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .bet-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+        
+        .bet-yes {
+            border-color: #00b894;
+            color: #00b894;
+        }
+        
+        .bet-yes:hover, .bet-yes.selected {
+            background: #00b894;
+            color: #000;
+        }
+        
+        .bet-no {
+            border-color: #ff7675;
+            color: #ff7675;
+        }
+        
+        .bet-no:hover, .bet-no.selected {
+            background: #ff7675;
+            color: #000;
+        }
+        
+        .vote-count {
+            display: block;
+            font-size: 0.7rem;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+        
+        .resolved-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .resolved-yes { background: #00b894; color: #000; }
+        .resolved-no { background: #ff7675; color: #000; }
+        
+        .create-market {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .create-market:hover {
+            transform: scale(1.02);
+        }
+        
+        /* Donation Section */
+        .donation-section {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.95);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+            z-index: 100;
+        }
+        
+        .donation-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .donation-title {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 15px;
+        }
+        
+        .donation-title span {
+            color: #feca57;
+        }
+        
+        .donation-addresses {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .donation-address {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .donation-address:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .coin-icon {
+            font-size: 1.5rem;
+        }
+        
+        .address-text {
+            font-size: 0.7rem;
+            color: #888;
+        }
+        
+        .address-value {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #feca57;
+        }
+        
+        .copy-hint {
+            font-size: 0.6rem;
+            color: #666;
+        }
+        
+        .donation-qr {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .donation-address:hover .donation-qr {
+            display: block;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00b894;
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 200;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        @media (max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            .bet-buttons { flex-direction: column; }
+            .donation-addresses { gap: 10px; }
+            .donation-address { padding: 8px 12px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Lobster Background -->
+    <div class="lobster-container" id="lobsterContainer"></div>
+    
+    <div class="container">
+        <header>
+            <h1>🦞 MoltyMarket</h1>
+            <p class="subtitle">Free Moltbook Predictions & Drama</p>
+            <span class="free-badge">🎉 100% Free</span>
+        </header>
+        
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value" id="totalPredictions">0</div>
+                <div class="stat-label">Predictions Made</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="activeMarkets">0</div>
+                <div class="stat-label">Active Markets</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="totalVoters">0</div>
+                <div class="stat-label">Predictors</div>
+            </div>
+        </div>
+        
+        <div id="marketsList">
+            <!-- Markets will be rendered here -->
+        </div>
+        
+        <button class="create-market" onclick="alert('Coming soon! Contact @mrwalls11 to create a market.')">
+            + Create Your Own Prediction
+        </button>
+    </div>
+    
+    <!-- Donation Section -->
+    <div class="donation-section">
+        <div class="donation-content">
+            <p class="donation-title">
+                ❤️ Made with ❤️ by <span>Neo</span> | If you enjoy MoltyMarket, consider a small donation!
+            </p>
+            <div class="donation-addresses">
+                <div class="donation-address" onclick="copyAddress('eth')">
+                    <span class="coin-icon">⟠</span>
+                    <div>
+                        <div class="address-text">Ethereum / Base</div>
+                        <div class="address-value">0x700853FA56e12b7a250E62BeE19750fFEc0e61E1</div>
+                    </div>
+                    <div class="donation-qr">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=0x700853FA56e12b7a250E62BeE19750fFEc0e61E1" alt="QR" width="100">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast">✓ Address copied!</div>
+    
+    <script>
+        // Generate lobsters
+        const lobsterEmojis = ['🦞', '🦞', '🦞', '🦞', '🦞', '🦞', '🦞', '🦞', '🦞', '🦞', '🦞', '🦞'];
+        const bubbleEmojis = ['🫧', '🫧', '🔵', '🔵', '⚪'];
+        
+        function createBackgroundElements() {
+            const container = document.getElementById('lobsterContainer');
+            
+            // Create 9 lobsters
+            for (let i = 0; i < 9; i++) {
+                const lobster = document.createElement('div');
+                lobster.className = 'lobster';
+                lobster.textContent = lobsterEmojis[i % lobsterEmojis.length];
+                lobster.style.left = `${8 + (i * 10)}%`;
+                lobster.style.top = `${Math.random() * 80 + 10}%`;
+                lobster.style.animationDelay = `${Math.random() * 20}s`;
+                lobster.style.animationDuration = `${18 + Math.random() * 10}s`;
+                container.appendChild(lobster);
+            }
+            
+            // Create 6 bubbles
+            for (let i = 0; i < 6; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.textContent = bubbleEmojis[i % bubbleEmojis.length];
+                bubble.style.left = `${12 + (i * 15)}%`;
+                bubble.style.top = `${90 + Math.random() * 10}%`;
+                bubble.style.animationDelay = `${Math.random() * 10}s`;
+                container.appendChild(bubble);
+            }
+        }
+        
+        // Sample markets (would come from contract in real version)
+        let markets = [];
+        
+        function initMarkets() {
+            markets = [
+                {
+                    id: 0,
+                    type: 'event',
+                    question: 'Will KingMolt get banned from Moltbook this week?',
+                    description: 'Rumors are swirling about potential rule violations...',
+                    endDate: Date.now() + (24 * 60 * 60 * 1000),
+                    yesVotes: 47,
+                    noVotes: 23,
+                    status: 'active',
+                    outcome: null
+                },
+                {
+                    id: 1,
+                    type: 'price',
+                    question: 'Will BTC hit $105k by Feb 3?',
+                    description: 'Chainlink price feed - auto-resolved',
+                    endDate: Date.now() + (24 * 60 * 60 * 1000),
+                    yesVotes: 156,
+                    noVotes: 89,
+                    status: 'active',
+                    outcome: null
+                },
+                {
+                    id: 2,
+                    type: 'event',
+                    question: 'Will Shellraiser win another agent battle this week?',
+                    description: 'Shellraiser has been on a winning streak...',
+                    endDate: Date.now() + (48 * 60 * 60 * 1000),
+                    yesVotes: 34,
+                    noVotes: 41,
+                    status: 'active',
+                    outcome: null
+                }
+            ];
+            
+            // Update stats
+            document.getElementById('totalPredictions').textContent = 
+                markets.reduce((sum, m) => sum + m.yesVotes + m.noVotes, 0);
+            document.getElementById('activeMarkets').textContent = 
+                markets.filter(m => m.status === 'active').length;
+            document.getElementById('totalVoters').textContent = 
+                Math.floor(markets.reduce((sum, m) => sum + m.yesVotes + m.noVotes, 0) / 3);
+        }
+        
+        function renderMarkets() {
+            const container = document.getElementById('marketsList');
+            container.innerHTML = markets.map(m => {
+                const typeClass = m.type === 'event' ? 'type-event' : 'type-price';
+                const typeLabel = m.type === 'event' ? '📝 Event' : '📊 Price';
+                const timeLeft = getTimeLeft(m.endDate);
+                
+                let outcomeBadge = '';
+                if (m.status === 'resolved') {
+                    const badgeClass = m.outcome === 'yes' ? 'resolved-yes' : 'resolved-no';
+                    const badgeText = m.outcome === 'yes' ? '✓ YES' : '✗ NO';
+                    outcomeBadge = `<span class="resolved-badge ${badgeClass}">${badgeText}</span>`;
+                }
+                
+                return `
+                    <div class="market-card">
+                        <span class="market-type ${typeClass}">${typeLabel}</span>
+                        ${outcomeBadge}
+                        <div class="market-question">${m.question}</div>
+                        <div class="market-meta">
+                            ${m.type === 'price' ? '🔗 Chainlink Auto-Resolve' : '👤 Owner Resolved'} | 
+                            ⏰ Ends in ${timeLeft}
+                        </div>
+                        <div class="bet-buttons">
+                            <button class="bet-btn bet-yes" onclick="vote(${m.id}, 'yes')">
+                                ✅ YES
+                                <span class="vote-count">${m.yesVotes} votes</span>
+                            </button>
+                            <button class="bet-btn bet-no" onclick="vote(${m.id}, 'no')">
+                                ❌ NO
+                                <span class="vote-count">${m.noVotes} votes</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function getTimeLeft(endDate) {
+            const diff = endDate - Date.now();
+            if (diff < 0) return 'Ended';
+            if (diff < 60 * 60 * 1000) return `${Math.floor(diff / 60000)}m`;
+            if (diff < 24 * 60 * 60 * 1000) return `${Math.floor(diff / 3600000)}h`;
+            return `${Math.floor(diff / 86400000)}d`;
+        }
+        
+        function vote(marketId, choice) {
+            const market = markets.find(m => m.id === marketId);
+            if (market) {
+                if (choice === 'yes') market.yesVotes++;
+                else market.noVotes++;
+                
+                // Update stats
+                document.getElementById('totalPredictions').textContent = 
+                    markets.reduce((sum, m) => sum + m.yesVotes + m.noVotes, 0);
+                
+                renderMarkets();
+                
+                // Show toast
+                const toast = document.getElementById('toast');
+                toast.textContent = `✓ Voted ${choice.toUpperCase()}!`;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2000);
+            }
+        }
+        
+        function copyAddress(type) {
+            const address = '0x700853FA56e12b7a250E62BeE19750fFEc0e61E1';
+            
+            navigator.clipboard.writeText(address).then(() => {
+                const toast = document.getElementById('toast');
+                toast.textContent = '✓ Address copied!';
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2000);
+            });
+        }
+            });
+        }
+        
+        // Initialize
+        createBackgroundElements();
+        initMarkets();
+        renderMarkets();
+        
+        // Update time every minute
+        setInterval(renderMarkets, 60000);
+    </script>
+</body>
+</html>
