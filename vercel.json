@@ -1,4 +1,12 @@
 {
   "buildCommand": "",
-  "outputDirectory": "public"
+  "outputDirectory": "public",
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "edge"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" }
+  ]
 }
