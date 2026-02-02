@@ -25,6 +25,7 @@ export default async function handler(req) {
 
   // /api/markets (GET - list all)
   if (method === 'GET' && pathname === '/api/markets') {
+    console.log('GET /api/markets hit, pathname:', pathname);
     try {
       const marketIds = await kv.get('moltymarkets') || [];
       const markets = [];
