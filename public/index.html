@@ -338,6 +338,19 @@
         /* Modal Styles */
         #createModal {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #createModal.active {
+            display: flex;
         }
         
         #createModal input,
@@ -432,7 +445,7 @@
     </div>
     
     <!-- Create Prediction Modal -->
-    <div id="createModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:500; display:flex; align-items:center; justify-content:center;">
+    <div id="createModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:500; align-items:center; justify-content:center;">
         <div style="background:#1a1a2e; padding:30px; border-radius:15px; max-width:500px; width:90%;">
             <h2 style="margin-bottom:20px;">Create Your Prediction</h2>
             <input type="text" id="newQuestion" placeholder="Will Moltbook..." style="width:100%; padding:12px; margin-bottom:15px; background:#0a0a0a; border:1px solid #333; color:#fff; border-radius:8px;">
@@ -595,7 +608,7 @@
         }
         
         function showCreateForm() {
-            document.getElementById('createModal').style.display = 'flex';
+            document.getElementById('createModal').classList.add('active');
             // Set default end date to 7 days from now
             const defaultDate = new Date();
             defaultDate.setDate(defaultDate.getDate() + 7);
@@ -603,7 +616,7 @@
         }
         
         function hideCreateForm() {
-            document.getElementById('createModal').style.display = 'none';
+            document.getElementById('createModal').classList.remove('active');
             document.getElementById('newQuestion').value = '';
             document.getElementById('newDescription').value = '';
         }
