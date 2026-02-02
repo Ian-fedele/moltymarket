@@ -11,7 +11,7 @@ export const config = { runtime: 'edge' };
 
 export default async function handler(req) {
   const url = new URL(req.url);
-  const path = url.pathname;
+  const pathname = url.pathname;
   const method = req.method;
   
   const headers = {
@@ -23,13 +23,8 @@ export default async function handler(req) {
 
   if (method === 'OPTIONS') return new Response(null, { status: 200, headers });
 
-  // /api/health
-  if (method === 'GET' && path === '/api/health') {
-    return new Response(JSON.stringify({ status: 'ok', storage: 'kv', time: new Date().toISOString() }), { headers });
-  }
-
-  // /api/markets
-  if (method === 'GET' && path === '/api/markets') {
+  // /api/markets (GET - list all)
+  if (method === 'GET' && pathname === '/api/markets') {
     try {
       const marketIds = await kv.get('moltymarkets') || [];
       const markets = [];
@@ -46,7 +41,7 @@ export default async function handler(req) {
   }
 
   // POST /api/markets (create)
-  if (method === 'POST' && path === '/api/markets') {
+  if (method === 'POST' && pathname === '/api/markets') {
     let body;
     try { body = await req.json(); } catch (e) {
       return new Response(JSON.stringify({ error: 'Invalid body' }), { status: 400, headers });
@@ -77,9 +72,13 @@ export default async function handler(req) {
     return new Response(JSON.stringify({ market }), { headers });
   }
 
-  // POST /api/markets/:id/vote
-  if (method === 'POST' && path.startsWith('/api/markets/') && path.endsWith('/vote')) {
-    const id = path.split('/api/markets/')[1].replace('/vote', '');
+  // POST /api/vote (query param for market id)
+  if (method === 'POST' && pathname === '/api/vote') {
+    const marketId = url.searchParams.get('id');
+    if (!marketId) {
+      return new Response(JSON.stringify({ error: 'Missing id parameter' }), { status: 400, headers });
+    }
+    
     let body;
     try { body = await req.json(); } catch (e) {
       return new Response(JSON.stringify({ error: 'Invalid body' }), { status: 400, headers });
@@ -91,20 +90,31 @@ export default async function handler(req) {
     }
 
     try {
-      let market = await kv.hgetall(`market:${id}`);
-      if (!market) market = memoryMarkets.get(id);
+      let market = await kv.hgetall(`market:${marketId}`);
+      if (!market) market = memoryMarkets.get(marketId);
       if (!market) return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers });
 
       if (choice === 'yes') market.yesVotes = (market.yesVotes || 0) + 1;
       else market.noVotes = (market.noVotes || 0) + 1;
 
-      await kv.hset(`market:${id}`, market);
-      memoryMarkets.set(id, market);
+      await kv.hset(`market:${marketId}`, market);
+      memoryMarkets.set(marketId, market);
       return new Response(JSON.stringify({ market, totalVotes: market.yesVotes + market.noVotes }), { headers });
     } catch (e) {
       return new Response(JSON.stringify({ error: 'DB error' }), { status: 500, headers });
     }
   }
 
-  return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers });
+  // /api (health/info)
+  if (method === 'GET' && pathname === '/api') {
+    return new Response(JSON.stringify({ 
+      name: 'MoltyMarket API',
+      status: 'ok',
+      storage: 'upstash-kv',
+      endpoints: ['/api (GET)', '/api/markets (GET)', '/api/markets (POST)', '/api/vote?id=xxx (POST)'],
+      time: new Date().toISOString()
+    }), { headers });
+  }
+
+  return new Response(JSON.stringify({ error: 'Not found', path: pathname }), { status: 404, headers });
 }
