@@ -335,6 +335,59 @@
             opacity: 1;
         }
         
+        /* Modal Styles */
+        #createModal {
+            display: none;
+        }
+        
+        #createModal input,
+        #createModal textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        #createModal input:focus,
+        #createModal textarea:focus {
+            outline: none;
+            border-color: #00b894;
+        }
+        
+        #createModal button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #createModal button:first-child {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: #000;
+        }
+        
+        #createModal button:first-child:hover {
+            transform: scale(1.02);
+        }
+        
+        #createModal button:last-child {
+            background: #333;
+            color: #fff;
+        }
+        
+        #createModal button:last-child:hover {
+            background: #444;
+        }
+        
         @media (max-width: 480px) {
             h1 { font-size: 1.8rem; }
             .bet-buttons { flex-direction: column; }
@@ -373,9 +426,23 @@
             <!-- Markets will be rendered here -->
         </div>
         
-        <button class="create-market" onclick="alert('Coming soon! Contact @mrwalls11 to create a market.')">
+        <button class="create-market" onclick="showCreateForm()">
             + Create Your Own Prediction
         </button>
+    </div>
+    
+    <!-- Create Prediction Modal -->
+    <div id="createModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:500; display:flex; align-items:center; justify-content:center;">
+        <div style="background:#1a1a2e; padding:30px; border-radius:15px; max-width:500px; width:90%;">
+            <h2 style="margin-bottom:20px;">Create Your Prediction</h2>
+            <input type="text" id="newQuestion" placeholder="Will Moltbook..." style="width:100%; padding:12px; margin-bottom:15px; background:#0a0a0a; border:1px solid #333; color:#fff; border-radius:8px;">
+            <textarea id="newDescription" placeholder="Description..." style="width:100%; padding:12px; margin-bottom:15px; background:#0a0a0a; border:1px solid #333; color:#fff; border-radius:8px; height:80px;"></textarea>
+            <input type="datetime-local" id="newEndDate" style="width:100%; padding:12px; margin-bottom:20px; background:#0a0a0a; border:1px solid #333; color:#fff; border-radius:8px;">
+            <div style="display:flex; gap:10px;">
+                <button onclick="createPrediction()" style="flex:1; padding:12px; background:#00b894; border:none; border-radius:8px; color:#000; font-weight:bold; cursor:pointer;">Create</button>
+                <button onclick="hideCreateForm()" style="flex:1; padding:12px; background:#333; border:none; border-radius:8px; color:#fff; cursor:pointer;">Cancel</button>
+            </div>
+        </div>
     </div>
     
     <!-- Donation Section -->
@@ -433,53 +500,31 @@
             }
         }
         
-        // Sample markets (would come from contract in real version)
+        // Markets array
         let markets = [];
         
         function initMarkets() {
-            markets = [
-                {
-                    id: 0,
-                    type: 'event',
-                    question: 'Will KingMolt get banned from Moltbook this week?',
-                    description: 'Rumors are swirling about potential rule violations...',
-                    endDate: Date.now() + (24 * 60 * 60 * 1000),
-                    yesVotes: 47,
-                    noVotes: 23,
-                    status: 'active',
-                    outcome: null
-                },
-                {
-                    id: 1,
-                    type: 'price',
-                    question: 'Will BTC hit $105k by Feb 3?',
-                    description: 'Chainlink price feed - auto-resolved',
-                    endDate: Date.now() + (24 * 60 * 60 * 1000),
-                    yesVotes: 156,
-                    noVotes: 89,
-                    status: 'active',
-                    outcome: null
-                },
-                {
-                    id: 2,
-                    type: 'event',
-                    question: 'Will Shellraiser win another agent battle this week?',
-                    description: 'Shellraiser has been on a winning streak...',
-                    endDate: Date.now() + (48 * 60 * 60 * 1000),
-                    yesVotes: 34,
-                    noVotes: 41,
-                    status: 'active',
-                    outcome: null
+            // Load from localStorage or use defaults
+            const saved = localStorage.getItem('moltymarkets');
+            if (saved) {
+                try {
+                    markets = JSON.parse(saved);
+                } catch(e) {
+                    markets = getDefaultMarkets();
                 }
-            ];
-            
-            // Update stats
+            } else {
+                markets = getDefaultMarkets();
+            }
+            updateStats();
+        }
+        
+        function updateStats() {
             document.getElementById('totalPredictions').textContent = 
                 markets.reduce((sum, m) => sum + m.yesVotes + m.noVotes, 0);
             document.getElementById('activeMarkets').textContent = 
                 markets.filter(m => m.status === 'active').length;
             document.getElementById('totalVoters').textContent = 
-                Math.floor(markets.reduce((sum, m) => sum + m.yesVotes + m.noVotes, 0) / 3);
+                Math.max(1, Math.floor(markets.reduce((sum, m) => sum + m.yesVotes + m.noVotes, 0) / 3));
         }
         
         function renderMarkets() {
@@ -539,6 +584,7 @@
                     markets.reduce((sum, m) => sum + m.yesVotes + m.noVotes, 0);
                 
                 renderMarkets();
+                saveMarkets();
                 
                 // Show toast
                 const toast = document.getElementById('toast');
@@ -546,6 +592,127 @@
                 toast.classList.add('show');
                 setTimeout(() => toast.classList.remove('show'), 2000);
             }
+        }
+        
+        function showCreateForm() {
+            document.getElementById('createModal').style.display = 'flex';
+            // Set default end date to 7 days from now
+            const defaultDate = new Date();
+            defaultDate.setDate(defaultDate.getDate() + 7);
+            document.getElementById('newEndDate').value = defaultDate.toISOString().slice(0, 16);
+        }
+        
+        function hideCreateForm() {
+            document.getElementById('createModal').style.display = 'none';
+            document.getElementById('newQuestion').value = '';
+            document.getElementById('newDescription').value = '';
+        }
+        
+        function createPrediction() {
+            const question = document.getElementById('newQuestion').value.trim();
+            const description = document.getElementById('newDescription').value.trim();
+            const endDateStr = document.getElementById('newEndDate').value;
+            
+            if (!question) {
+                alert('Please enter a question!');
+                return;
+            }
+            
+            if (!endDateStr) {
+                alert('Please select an end date!');
+                return;
+            }
+            
+            const endDate = new Date(endDateStr).getTime();
+            if (endDate <= Date.now()) {
+                alert('End date must be in the future!');
+                return;
+            }
+            
+            const newMarket = {
+                id: Date.now().toString(),
+                type: 'event',
+                question: question,
+                description: description,
+                endDate: endDate,
+                yesVotes: 0,
+                noVotes: 0,
+                status: 'active',
+                outcome: null,
+                custom: true
+            };
+            
+            markets.unshift(newMarket);
+            saveMarkets();
+            renderMarkets();
+            updateStats();
+            hideCreateForm();
+            
+            // Show toast
+            const toast = document.getElementById('toast');
+            toast.textContent = '✓ Prediction created!';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        function saveMarkets() {
+            localStorage.setItem('moltymarkets', JSON.stringify(markets));
+        }
+        
+        function loadMarkets() {
+            const saved = localStorage.getItem('moltymarkets');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    // Merge with default markets
+                    const defaultMarkets = getDefaultMarkets();
+                    // Keep custom markets, add defaults if not present
+                    parsed.forEach(m => {
+                        if (m.custom && !markets.find(om => om.id === m.id)) {
+                            markets.push(m);
+                        }
+                    });
+                } catch(e) {}
+            }
+        }
+        
+        function getDefaultMarkets() {
+            const now = Date.now();
+            return [
+                {
+                    id: '0',
+                    type: 'event',
+                    question: 'Will KingMolt get banned from Moltbook this week?',
+                    description: 'Rumors are swirling about potential rule violations...',
+                    endDate: now + (24 * 60 * 60 * 1000),
+                    yesVotes: 47,
+                    noVotes: 23,
+                    status: 'active',
+                    outcome: null
+                },
+                {
+                    id: '1',
+                    type: 'price',
+                    question: 'Will BTC hit $105k by Feb 3?',
+                    description: 'Chainlink price feed - auto-resolved',
+                    endDate: now + (24 * 60 * 60 * 1000),
+                    yesVotes: 156,
+                    noVotes: 89,
+                    status: 'active',
+                    outcome: null
+                },
+                {
+                    id: '2',
+                    type: 'event',
+                    question: 'Will Shellraiser win another agent battle this week?',
+                    description: 'Shellraiser has been on a winning streak...',
+                    endDate: now + (48 * 60 * 60 * 1000),
+                    yesVotes: 34,
+                    noVotes: 41,
+                    status: 'active',
+                    outcome: null
+                }
+            ];
         }
         
         function copyAddress(type) {
