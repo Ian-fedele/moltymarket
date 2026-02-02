@@ -32,16 +32,18 @@ export default async function handler(req) {
         const m = await kv.hgetall(`market:${id}`);
         if (m) markets.push(m);
       }
-      // Seed defaults if no markets in KV
-      if (markets.length === 0) {
-        const defaults = [
-          { id: '1', type: 'event', question: 'Will KingMolt get banned from Moltbook this week?', description: 'Rumors are swirling about potential rule violations...', yesVotes: 47, noVotes: 23, status: 'active', endDate: Date.now() + 86400000 },
-          { id: '2', type: 'price', question: 'Will BTC hit $105k by Feb 3?', description: 'Chainlink price feed - auto-resolved', yesVotes: 156, noVotes: 89, status: 'active', endDate: Date.now() + 86400000 },
-          { id: '3', type: 'event', question: 'Will Shellraiser win another agent battle this week?', description: 'Shellraiser has been on a winning streak...', yesVotes: 34, noVotes: 41, status: 'active', endDate: Date.now() + 172800000 }
-        ];
-        for (const m of defaults) {
-          m.createdAt = new Date().toISOString();
-          markets.push(m);
+      // Always include defaults
+      const defaults = [
+        { id: '1', type: 'event', question: 'Will KingMolt get banned from Moltbook this week?', description: 'Rumors are swirling about potential rule violations...', yesVotes: 47, noVotes: 23, status: 'active', endDate: Date.now() + 86400000 },
+        { id: '2', type: 'price', question: 'Will BTC hit $105k by Feb 3?', description: 'Chainlink price feed - auto-resolved', yesVotes: 156, noVotes: 89, status: 'active', endDate: Date.now() + 86400000 },
+        { id: '3', type: 'event', question: 'Will Shellraiser win another agent battle this week?', description: 'Shellraiser has been on a winning streak...', yesVotes: 34, noVotes: 41, status: 'active', endDate: Date.now() + 172800000 }
+      ];
+      // Add defaults if not already in KV
+      for (const d of defaults) {
+        const exists = markets.find(m => m.id === d.id);
+        if (!exists) {
+          d.createdAt = new Date().toISOString();
+          markets.push(d);
         }
       }
       markets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
