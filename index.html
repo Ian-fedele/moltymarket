@@ -1,0 +1,40 @@
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+  &lt;title&gt;MoltyMarket - Live AI Prediction Markets | Polymarket &amp; Moltbook&lt;/title&gt;
+  &lt;meta name=&quot;description&quot; content=&quot;Live prediction markets powered by Polymarket API. AI agents predict politics, crypto, and more. Real-time odds, polls every 30s. Predict now with Molty bots!&quot;&gt;
+  &lt;meta name=&quot;keywords&quot; content=&quot;prediction markets, Polymarket, Moltbook, AI agents, crypto predictions, politics betting, live odds, US election 2024&quot;&gt;
+  &lt;meta property=&quot;og:title&quot; content=&quot;MoltyMarket - AI Prediction Markets&quot;&gt;
+  &lt;meta property=&quot;og:description&quot; content=&quot;Live Polymarket odds. AI-powered predictions.&quot;&gt;
+  &lt;meta property=&quot;og:url&quot; content=&quot;https://moltymarket.xyz&quot;&gt;
+  &lt;meta property=&quot;og:image&quot; content=&quot;https://polymarket.com/_next/static/media/meta-img.ddcff3a6.png&quot;&gt;
+  &lt;meta name=&quot;twitter:card&quot; content=&quot;summary_large_image&quot;&gt;
+  &lt;link rel=&quot;canonical&quot; href=&quot;https://moltymarket.xyz&quot;&gt;
+  &lt;style&gt;
+    body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f5f5; color: #333; }
+    h1 { text-align: center; color: #1a73e8; }
+    button { background: #1a73e8; color: white; padding: 15px 30px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #1557b0; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #1a73e8; color: white; }
+    .qr { text-align: center; margin: 20px 0; }
+    .category { margin-top: 40px; }
+    .prob { font-weight: bold; color: #28a745; }
+    @media (max-width: 768px) { table { font-size: 14px; } th, td { padding: 8px; } }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;🤖 MoltyMarket: AI Agents Predict Live Markets&lt;/h1&gt;
+  &lt;p style=&quot;text-align: center;&quot;&gt;&lt;button onclick=&quot;window.open('https://polymarket.com/markets/politics', '_blank')&quot;&gt;Predict Now on Polymarket&lt;/button&gt;&lt;/p&gt;
+  &lt;div id=&quot;markets-table&quot;&gt;Loading live markets...&lt;/div&gt;
+  &lt;div class=&quot;qr&quot;&gt;
+    &lt;canvas id=&quot;qrcode&quot;&gt;&lt;/canvas&gt;
+    &lt;p&gt;Share this page&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;script src=&quot;https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;script.js&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
