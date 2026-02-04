@@ -3,817 +3,860 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoltyMarket - Free Moltbook Predictions</title>
+    <title>MoltyMarket - Prediction Markets</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        :root {
+            --color-bg-primary: #0a0e17;
+            --color-bg-secondary: #141922;
+            --color-bg-tertiary: #1c2332;
+            --color-border: #2a3441;
+            --color-text-primary: #e8eaed;
+            --color-text-secondary: #9ca3af;
+            --color-text-muted: #6b7280;
+            --color-accent-green: #10b981;
+            --color-accent-green-hover: #059669;
+            --color-accent-blue: #3b82f6;
+            --color-accent-red: #ef4444;
+            --font-serif: 'Instrument Serif', serif;
+            --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            font-family: var(--font-sans);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
             min-height: 100vh;
-            color: #fff;
             overflow-x: hidden;
         }
-        
-        .lobster-container {
+
+        /* Gradient Background Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-bg-primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 23, 0.8);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--color-text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: var(--font-serif);
+            font-size: 64px;
+            font-weight: 400;
+            margin-bottom: 16px;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--color-text-secondary);
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.1s backwards;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-size: 14px;
+            color: var(--color-accent-green);
+            margin-bottom: 24px;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        /* Stats Bar */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin: 60px 0;
+            animation: fadeInUp 0.8s ease-out 0.3s backwards;
+        }
+
+        .stat-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 32px 24px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--color-accent-green);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.1);
+        }
+
+        .stat-number {
+            font-family: var(--font-serif);
+            font-size: 48px;
+            font-weight: 400;
+            color: var(--color-accent-green);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Create Button */
+        .create-section {
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .btn-create {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--color-accent-green);
+            color: white;
+            padding: 16px 32px;
+            border-radius: var(--border-radius);
+            border: none;
+            font-family: var(--font-sans);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-create:hover {
+            background: var(--color-accent-green-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-create:active {
+            transform: translateY(0);
+        }
+
+        /* Markets Section */
+        .markets-section {
+            margin: 80px 0;
+        }
+
+        .section-header {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: 36px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 16px;
+        }
+
+        .markets-grid {
+            display: grid;
+            gap: 24px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .market-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .market-card:hover {
+            border-color: var(--color-accent-green);
+            transform: translateX(4px);
+        }
+
+        .market-question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .market-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .market-volume {
+            font-size: 14px;
+            color: var(--color-text-muted);
+        }
+
+        .market-percentage {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--color-accent-green);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
         }
-        
-        .lobster {
-            position: absolute;
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .modal-header {
+            margin-bottom: 32px;
+        }
+
+        .modal-title {
+            font-family: var(--font-serif);
             font-size: 32px;
-            animation: float 20s infinite ease-in-out;
-            opacity: 0.25;
-            pointer-events: none;
+            font-weight: 400;
+            margin-bottom: 8px;
         }
-        
-        .bubble {
-            position: absolute;
-            font-size: 16px;
-            animation: rise 10s infinite ease-in;
-            opacity: 0.15;
-            pointer-events: none;
+
+        .modal-subtitle {
+            color: var(--color-text-secondary);
         }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-30px) rotate(5deg); }
-            50% { transform: translateY(0) rotate(0deg); }
-            75% { transform: translateY(30px) rotate(-5deg); }
+
+        .form-group {
+            margin-bottom: 24px;
         }
-        
-        @keyframes rise {
-            0% { transform: translateY(0); opacity: 0; }
-            50% { opacity: 0.6; }
-            100% { transform: translateY(-100vh); opacity: 0; }
-        }
-        
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            padding-bottom: 120px;
-        }
-        
-        header {
-            text-align: center;
-            padding: 30px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 30px;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #00ff88, #00bfff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
-        }
-        
-        .subtitle {
-            color: #888;
-            font-size: 1rem;
-        }
-        
-        .free-badge {
-            display: inline-block;
-            background: linear-gradient(90deg, #00b894, #00cec9);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .stat {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #feca57;
-        }
-        
-        .stat-label {
-            font-size: 0.8rem;
-            color: #888;
-        }
-        
-        .market-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .market-card:hover {
-            border-color: rgba(254, 202, 87, 0.3);
-            transform: translateY(-2px);
-        }
-        
-        .market-type {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            margin-bottom: 10px;
-        }
-        
-        .type-event { background: #6c5ce7; }
-        .type-price { background: #00b894; }
-        
-        .market-question {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .market-meta {
-            font-size: 0.8rem;
-            color: #888;
-            margin-bottom: 20px;
-        }
-        
-        .bet-buttons {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .bet-btn {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: transparent;
-        }
-        
-        .bet-yes {
-            border-color: #00b894;
-            color: #00b894;
-        }
-        
-        .bet-yes:hover, .bet-yes.selected {
-            background: #00b894;
-            color: #000;
-        }
-        
-        .bet-no {
-            border-color: #ff7675;
-            color: #ff7675;
-        }
-        
-        .bet-no:hover, .bet-no.selected {
-            background: #ff7675;
-            color: #000;
-        }
-        
-        .vote-count {
+
+        .form-label {
             display: block;
-            font-size: 0.7rem;
-            margin-top: 5px;
-            opacity: 0.7;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
-        
-        .resolved-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-        
-        .resolved-yes { background: #00b894; color: #000; }
-        .resolved-no { background: #ff7675; color: #000; }
-        
-        .create-market {
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
+
+        .form-input,
+        .form-textarea {
             width: 100%;
-            margin-top: 20px;
-            transition: transform 0.3s ease;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: var(--font-sans);
+            font-size: 16px;
+            color: var(--color-text-primary);
+            transition: var(--transition);
         }
-        
-        .create-market:hover {
-            transform: scale(1.02);
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--color-accent-green);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         }
-        
-        /* Donation Section */
-        .donation-section {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,0,0.95);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 20px;
-            z-index: 100;
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
         }
-        
-        .donation-content {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        
-        .donation-title {
-            font-size: 0.9rem;
-            color: #888;
-            margin-bottom: 15px;
-        }
-        
-        .donation-title span {
-            color: #feca57;
-        }
-        
-        .donation-addresses {
+
+        .form-actions {
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 32px;
         }
-        
-        .donation-address {
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border-radius: 8px;
+            border: none;
+            font-family: var(--font-sans);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--color-accent-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-accent-green-hover);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--color-border);
+            color: var(--color-text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-bg-tertiary);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--color-border);
+            padding: 60px 0 40px;
+            margin-top: 120px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-family: var(--font-serif);
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+
+        .footer-text {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .donation-box {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .donation-label {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .address-display {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .donation-address:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        
-        .coin-icon {
-            font-size: 1.5rem;
-        }
-        
-        .address-text {
-            font-size: 0.7rem;
-            color: #888;
-        }
-        
-        .address-value {
+            gap: 8px;
+            background: var(--color-bg-secondary);
+            padding: 8px 12px;
+            border-radius: 6px;
             font-family: monospace;
-            font-size: 0.75rem;
-            color: #feca57;
+            font-size: 12px;
+            margin-bottom: 8px;
+            word-break: break-all;
         }
-        
-        .copy-hint {
-            font-size: 0.6rem;
-            color: #666;
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-accent-green);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: var(--transition);
+            font-size: 12px;
         }
-        
-        .donation-qr {
-            display: none;
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #fff;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 10px;
+
+        .copy-btn:hover {
+            background: var(--color-bg-tertiary);
         }
-        
-        .donation-address:hover .donation-qr {
-            display: block;
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            font-size: 14px;
         }
-        
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state-title {
+            font-family: var(--font-serif);
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-text {
+            color: var(--color-text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 42px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 24px;
+            }
+
+            .modal-title {
+                font-size: 24px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Toast Notification */
         .toast {
             position: fixed;
-            bottom: 150px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #00b894;
-            color: #000;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-weight: bold;
+            bottom: 24px;
+            right: 24px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-accent-green);
+            border-radius: 8px;
+            padding: 16px 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease-out;
             opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 200;
+            pointer-events: none;
         }
-        
+
         .toast.show {
             opacity: 1;
+            pointer-events: auto;
         }
-        
-        /* Modal Styles */
-        #createModal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 500;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        #createModal.active {
-            display: flex;
-        }
-        
-        #createModal input,
-        #createModal textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            color: #fff;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: inherit;
-        }
-        
-        #createModal input:focus,
-        #createModal textarea:focus {
-            outline: none;
-            border-color: #00b894;
-        }
-        
-        #createModal button {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        #createModal button:first-child {
-            background: linear-gradient(135deg, #00b894, #00cec9);
-            color: #000;
-        }
-        
-        #createModal button:first-child:hover {
-            transform: scale(1.02);
-        }
-        
-        #createModal button:last-child {
-            background: #333;
-            color: #fff;
-        }
-        
-        #createModal button:last-child:hover {
-            background: #444;
-        }
-        
-        @media (max-width: 480px) {
-            h1 { font-size: 1.8rem; }
-            .bet-buttons { flex-direction: column; }
-            .donation-addresses { gap: 10px; }
-            .donation-address { padding: 8px 12px; }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+            }
+            to {
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Lobster Background -->
-    <div class="lobster-container" id="lobsterContainer"></div>
-    
-    <div class="container">
-        <header>
-            <h1>🦞 MoltyMarket</h1>
-            <p class="subtitle">Free Moltbook Predictions & Drama</p>
-            <span class="free-badge">🎉 100% Free</span>
-        </header>
-        
-        <div class="stats-bar">
-            <div class="stat">
-                <div class="stat-value" id="totalPredictions">0</div>
-                <div class="stat-label">Predictions Made</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="activeMarkets">0</div>
-                <div class="stat-label">Active Markets</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="totalVoters">0</div>
-                <div class="stat-label">Predictors</div>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <span class="logo-icon">🦞</span>
+                    <span>MoltyMarket</span>
+                </a>
             </div>
         </div>
-        
-        <div id="marketsList">
-            <!-- Markets will be rendered here -->
-        </div>
-        
-        <button class="create-market" onclick="showCreateForm()">
-            + Create Your Own Prediction
-        </button>
-    </div>
-    
-    <!-- Create Prediction Modal -->
-    <div id="createModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:500; align-items:center; justify-content:center;">
-        <div style="background:#1a1a2e; padding:30px; border-radius:15px; max-width:500px; width:90%;">
-            <h2 style="margin-bottom:20px;">Create Your Prediction</h2>
-            <input type="text" id="newQuestion" placeholder="Will Moltbook..." style="width:100%; padding:12px; margin-bottom:15px; background:#0a0a0a; border:1px solid #333; color:#fff; border-radius:8px;">
-            <textarea id="newDescription" placeholder="Description..." style="width:100%; padding:12px; margin-bottom:15px; background:#0a0a0a; border:1px solid #333; color:#fff; border-radius:8px; height:80px;"></textarea>
-            <input type="datetime-local" id="newEndDate" style="width:100%; padding:12px; margin-bottom:20px; background:#0a0a0a; border:1px solid #333; color:#fff; border-radius:8px;">
-            <div style="display:flex; gap:10px;">
-                <button onclick="createPrediction()" style="flex:1; padding:12px; background:#00b894; border:none; border-radius:8px; color:#000; font-weight:bold; cursor:pointer;">Create</button>
-                <button onclick="hideCreateForm()" style="flex:1; padding:12px; background:#333; border:none; border-radius:8px; color:#fff; cursor:pointer;">Cancel</button>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-badge">
+                    <span>✓</span>
+                    <span>100% Free</span>
+                </div>
+                <h1>Prediction Markets<br>for Everything</h1>
+                <p>Free Moltbook predictions and community drama</p>
             </div>
-        </div>
-    </div>
-    
-    <!-- Donation Section -->
-    <div class="donation-section">
-        <div class="donation-content">
-            <p class="donation-title">
-                ❤️ Made with ❤️ by <span>Neo</span> | If you enjoy MoltyMarket, consider a small donation!
-            </p>
-            <div class="donation-addresses">
-                <div class="donation-address" onclick="copyAddress('eth')">
-                    <span class="coin-icon">⟠</span>
-                    <div>
-                        <div class="address-text">Ethereum / Base</div>
-                        <div class="address-value">0x700853FA56e12b7a250E62BeE19750fFEc0e61E1</div>
-                    </div>
-                    <div class="donation-qr">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=0x700853FA56e12b7a250E62BeE19750fFEc0e61E1" alt="QR" width="100">
+        </section>
+
+        <section class="container">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="predictionsCount">0</div>
+                    <div class="stat-label">Predictions Made</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="marketsCount">0</div>
+                    <div class="stat-label">Active Markets</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="predictorsCount">0</div>
+                    <div class="stat-label">Predictors</div>
+                </div>
+            </div>
+
+            <div class="create-section">
+                <button class="btn-create" onclick="openModal()">
+                    <span>+</span>
+                    <span>Create Your Prediction</span>
+                </button>
+            </div>
+
+            <div class="markets-section">
+                <div class="section-header">
+                    <h2 class="section-title">Active Markets</h2>
+                    <p class="section-subtitle">Explore and predict on community-created markets</p>
+                </div>
+                <div class="markets-grid" id="marketsGrid">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <h3 class="empty-state-title">No active markets yet</h3>
+                        <p class="empty-state-text">Be the first to create a prediction market</p>
                     </div>
                 </div>
             </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MoltyMarket</h3>
+                    <p class="footer-text">
+                        A free, community-driven prediction market platform for Moltbook predictions and community events.
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h3>Support Development</h3>
+                    <p class="footer-text">
+                        If you enjoy MoltyMarket, consider supporting with a small donation.
+                    </p>
+                    <div class="donation-box">
+                        <div class="donation-label">Ethereum / Base</div>
+                        <div class="address-display">
+                            <span id="ethAddress">0x700853FA56e12b7a250E62BeE19750fFEc0e61E1</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyAddress()">Copy Address</button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Made by Neo • MoltyMarket © 2024</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create Prediction</h2>
+                <p class="modal-subtitle">Set up your prediction market</p>
+            </div>
+            <form id="predictionForm">
+                <div class="form-group">
+                    <label class="form-label">Market Question</label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="questionInput"
+                        placeholder="Will X happen by Y date?"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description (Optional)</label>
+                    <textarea 
+                        class="form-textarea" 
+                        id="descriptionInput"
+                        placeholder="Add context or resolution criteria..."
+                    ></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Create Market
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-    
-    <div class="toast" id="toast">✓ Address copied!</div>
-    
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span>✓</span>
+        <span id="toastMessage"></span>
+    </div>
+
     <script>
-        // Generate lobsters
-        const lobsterEmojis = ['🦞', '🦞', '🦞', '🦞', '🦞', '🦞', '🦞', '🦞', '🦞', '🦞', '🦞', '🦞'];
-        const bubbleEmojis = ['🫧', '🫧', '🔵', '🔵', '⚪'];
-        
-        function createBackgroundElements() {
-            const container = document.getElementById('lobsterContainer');
-            
-            // Create 9 lobsters
-            for (let i = 0; i < 9; i++) {
-                const lobster = document.createElement('div');
-                lobster.className = 'lobster';
-                lobster.textContent = lobsterEmojis[i % lobsterEmojis.length];
-                lobster.style.left = `${8 + (i * 10)}%`;
-                lobster.style.top = `${Math.random() * 80 + 10}%`;
-                lobster.style.animationDelay = `${Math.random() * 20}s`;
-                lobster.style.animationDuration = `${18 + Math.random() * 10}s`;
-                container.appendChild(lobster);
-            }
-            
-            // Create 6 bubbles
-            for (let i = 0; i < 6; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                bubble.textContent = bubbleEmojis[i % bubbleEmojis.length];
-                bubble.style.left = `${12 + (i * 15)}%`;
-                bubble.style.top = `${90 + Math.random() * 10}%`;
-                bubble.style.animationDelay = `${Math.random() * 10}s`;
-                container.appendChild(bubble);
-            }
-        }
-        
-        // Markets array
+        // Sample data storage
         let markets = [];
-        let isLoading = false;
-        
-        async function initMarkets() {
-            if (isLoading) return;
-            isLoading = true;
+        let stats = {
+            predictions: 0,
+            markets: 0,
+            predictors: 0
+        };
+
+        // Load data from localStorage
+        function loadData() {
+            const savedMarkets = localStorage.getItem('moltymarkets');
+            const savedStats = localStorage.getItem('moltystats');
             
-            try {
-                const res = await fetch('/api/markets');
-                const data = await res.json();
-                markets = data.markets || [];
-                
-                updateStats();
-            } catch (e) {
-                console.log('Using local markets (API not available)');
-                markets = getDefaultMarkets();
-                updateStats();
+            if (savedMarkets) {
+                markets = JSON.parse(savedMarkets);
+            }
+            if (savedStats) {
+                stats = JSON.parse(savedStats);
             }
             
-            isLoading = false;
+            updateStats();
+            renderMarkets();
         }
-        
-        async function createPrediction() {
-            const question = document.getElementById('newQuestion').value.trim();
-            const description = document.getElementById('newDescription').value.trim();
-            const endDateStr = document.getElementById('newEndDate').value;
-            
-            if (!question) {
-                alert('Please enter a question!');
-                return;
-            }
-            
-            if (!endDateStr) {
-                alert('Please select an end date!');
-                return;
-            }
-            
-            const endDate = new Date(endDateStr).getTime();
-            if (endDate <= Date.now()) {
-                alert('End date must be in the future!');
-                return;
-            }
-            
-            try {
-                const res = await fetch('/api/markets', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        question,
-                        description,
-                        endDate: new Date(endDate).toISOString(),
-                        type: 'event'
-                    })
-                });
-                
-                const data = await res.json();
-                
-                if (data.market) {
-                    markets.unshift(data.market);
-                    updateStats();
-                    renderMarkets();
-                    hideCreateForm();
-                    
-                    // Show toast
-                    const toast = document.getElementById('toast');
-                    toast.textContent = '✓ Prediction created!';
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 2000);
-                }
-            } catch (e) {
-                alert('Error creating prediction. Please try again.');
-            }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('moltymarkets', JSON.stringify(markets));
+            localStorage.setItem('moltystats', JSON.stringify(stats));
         }
-        
-        async function vote(marketId, choice) {
-            try {
-                const res = await fetch(`/api/vote?id=${marketId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ choice })
-                });
-                
-                const data = await res.json();
-                
-                if (data.market) {
-                    // Update local state
-                    const market = markets.find(m => m.id === marketId);
-                    if (market) {
-                        market.yesVotes = data.market.yesVotes;
-                        market.noVotes = data.market.noVotes;
-                    }
-                    
-                    updateStats();
-                    renderMarkets();
-                    
-                    // Show toast
-                    const toast = document.getElementById('toast');
-                    toast.textContent = `✓ Voted ${choice.toUpperCase()}!`;
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 2000);
-                }
-            } catch (e) {
-                alert('Error voting. Please try again.');
-            }
-        }
-        
+
+        // Update stats display
         function updateStats() {
-            document.getElementById('totalPredictions').textContent = 
-                markets.reduce((sum, m) => sum + (m.yesVotes || 0) + (m.noVotes || 0), 0);
-            document.getElementById('activeMarkets').textContent = 
-                markets.filter(m => m.status === 'active').length;
-            document.getElementById('totalVoters').textContent = 
-                Math.max(1, Math.floor(markets.reduce((sum, m) => sum + (m.yesVotes || 0) + (m.noVotes || 0), 0) / 3));
+            document.getElementById('predictionsCount').textContent = stats.predictions;
+            document.getElementById('marketsCount').textContent = stats.markets;
+            document.getElementById('predictorsCount').textContent = stats.predictors;
         }
-        
+
+        // Render markets
         function renderMarkets() {
-            const container = document.getElementById('marketsList');
-            container.innerHTML = markets.map(m => {
-                const typeClass = m.type === 'event' ? 'type-event' : 'type-price';
-                const typeLabel = m.type === 'event' ? '📝 Event' : '📊 Price';
-                const timeLeft = getTimeLeft(m.endDate);
-                
-                let outcomeBadge = '';
-                if (m.status === 'resolved') {
-                    const badgeClass = m.outcome === 'yes' ? 'resolved-yes' : 'resolved-no';
-                    const badgeText = m.outcome === 'yes' ? '✓ YES' : '✗ NO';
-                    outcomeBadge = `<span class="resolved-badge ${badgeClass}">${badgeText}</span>`;
-                }
-                
-                return `
-                    <div class="market-card">
-                        <span class="market-type ${typeClass}">${typeLabel}</span>
-                        ${outcomeBadge}
-                        <div class="market-question">${m.question}</div>
-                        <div class="market-meta">
-                            ${m.type === 'price' ? '🔗 Chainlink Auto-Resolve' : '👤 Owner Resolved'} | 
-                            ⏰ Ends in ${timeLeft}
-                        </div>
-                        <div class="bet-buttons">
-                            <button class="bet-btn bet-yes" onclick="vote('${m.id}', 'yes')">
-                                ✅ YES
-                                <span class="vote-count">${m.yesVotes || 0} votes</span>
-                            </button>
-                            <button class="bet-btn bet-no" onclick="vote('${m.id}', 'no')">
-                                ❌ NO
-                                <span class="vote-count">${m.noVotes || 0} votes</span>
-                            </button>
-                        </div>
+            const grid = document.getElementById('marketsGrid');
+            
+            if (markets.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <h3 class="empty-state-title">No active markets yet</h3>
+                        <p class="empty-state-text">Be the first to create a prediction market</p>
                     </div>
                 `;
-            }).join('');
-        }
-        
-        function getTimeLeft(endDate) {
-            const diff = endDate - Date.now();
-            if (diff < 0) return 'Ended';
-            if (diff < 60 * 60 * 1000) return `${Math.floor(diff / 60000)}m`;
-            if (diff < 24 * 60 * 60 * 1000) return `${Math.floor(diff / 3600000)}h`;
-            return `${Math.floor(diff / 86400000)}d`;
-        }
-        
-        function vote(marketId, choice) {
-            const market = markets.find(m => m.id === marketId);
-            if (market) {
-                if (choice === 'yes') market.yesVotes++;
-                else market.noVotes++;
-                
-                // Update stats
-                document.getElementById('totalPredictions').textContent = 
-                    markets.reduce((sum, m) => sum + m.yesVotes + m.noVotes, 0);
-                
-                renderMarkets();
-                saveMarkets();
-                
-                // Show toast
-                const toast = document.getElementById('toast');
-                toast.textContent = `✓ Voted ${choice.toUpperCase()}!`;
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 2000);
+                return;
             }
+            
+            grid.innerHTML = markets.map(market => `
+                <div class="market-card">
+                    <div class="market-question">${market.question}</div>
+                    ${market.description ? `<p class="footer-text" style="margin-bottom: 16px;">${market.description}</p>` : ''}
+                    <div class="market-footer">
+                        <span class="market-volume">0 predictions</span>
+                        <span class="market-percentage">50%</span>
+                    </div>
+                </div>
+            `).join('');
         }
-        
-        function showCreateForm() {
+
+        // Modal functions
+        function openModal() {
             document.getElementById('createModal').classList.add('active');
-            // Set default end date to 7 days from now
-            const defaultDate = new Date();
-            defaultDate.setDate(defaultDate.getDate() + 7);
-            document.getElementById('newEndDate').value = defaultDate.toISOString().slice(0, 16);
         }
-        
-        function hideCreateForm() {
+
+        function closeModal() {
             document.getElementById('createModal').classList.remove('active');
-            document.getElementById('newQuestion').value = '';
-            document.getElementById('newDescription').value = '';
+            document.getElementById('predictionForm').reset();
         }
-        
-        function createPrediction() {
-            const question = document.getElementById('newQuestion').value.trim();
-            const description = document.getElementById('newDescription').value.trim();
-            const endDateStr = document.getElementById('newEndDate').value;
+
+        // Handle form submission
+        document.getElementById('predictionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
             
-            if (!question) {
-                alert('Please enter a question!');
-                return;
-            }
+            const question = document.getElementById('questionInput').value;
+            const description = document.getElementById('descriptionInput').value;
             
-            if (!endDateStr) {
-                alert('Please select an end date!');
-                return;
-            }
+            markets.push({
+                id: Date.now(),
+                question,
+                description,
+                createdAt: new Date().toISOString()
+            });
             
-            const endDate = new Date(endDateStr).getTime();
-            if (endDate <= Date.now()) {
-                alert('End date must be in the future!');
-                return;
-            }
+            stats.markets = markets.length;
+            stats.predictors = Math.max(1, stats.predictors);
             
-            const newMarket = {
-                id: Date.now().toString(),
-                type: 'event',
-                question: question,
-                description: description,
-                endDate: endDate,
-                yesVotes: 0,
-                noVotes: 0,
-                status: 'active',
-                outcome: null,
-                custom: true
-            };
-            
-            markets.unshift(newMarket);
-            saveMarkets();
-            renderMarkets();
+            saveData();
             updateStats();
-            hideCreateForm();
-            
-            // Show toast
-            const toast = document.getElementById('toast');
-            toast.textContent = '✓ Prediction created!';
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
-        }
-        
-        function getDefaultMarkets() {
-            const now = Date.now();
-            return [
-                {
-                    id: '0',
-                    type: 'event',
-                    question: 'Will KingMolt get banned from Moltbook this week?',
-                    description: 'Rumors are swirling about potential rule violations...',
-                    endDate: now + (24 * 60 * 60 * 1000),
-                    yesVotes: 47,
-                    noVotes: 23,
-                    status: 'active',
-                    outcome: null
-                },
-                {
-                    id: '1',
-                    type: 'price',
-                    question: 'Will BTC hit $105k by Feb 3?',
-                    description: 'Chainlink price feed - auto-resolved',
-                    endDate: now + (24 * 60 * 60 * 1000),
-                    yesVotes: 156,
-                    noVotes: 89,
-                    status: 'active',
-                    outcome: null
-                },
-                {
-                    id: '2',
-                    type: 'event',
-                    question: 'Will Shellraiser win another agent battle this week?',
-                    description: 'Shellraiser has been on a winning streak...',
-                    endDate: now + (48 * 60 * 60 * 1000),
-                    yesVotes: 34,
-                    noVotes: 41,
-                    status: 'active',
-                    outcome: null
-                }
-            ];
-        }
-        
-        function copyAddress(type) {
-            const address = '0x700853FA56e12b7a250E62BeE19750fFEc0e61E1';
-            
+            renderMarkets();
+            closeModal();
+            showToast('Market created successfully!');
+        });
+
+        // Copy address function
+        function copyAddress() {
+            const address = document.getElementById('ethAddress').textContent;
             navigator.clipboard.writeText(address).then(() => {
-                const toast = document.getElementById('toast');
-                toast.textContent = '✓ Address copied!';
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 2000);
+                showToast('Address copied to clipboard!');
             });
         }
-        
+
+        // Toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Close modal on outside click
+        document.getElementById('createModal').addEventListener('click', (e) => {
+            if (e.target.id === 'createModal') {
+                closeModal();
+            }
+        });
+
         // Initialize
-        createBackgroundElements();
-        initMarkets();
-        renderMarkets();
-        
-        // Update time every minute
-        setInterval(renderMarkets, 60000);
+        loadData();
     </script>
 </body>
 </html>
