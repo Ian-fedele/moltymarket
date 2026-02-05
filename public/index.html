@@ -1,1 +1,1458 @@
-FILE_CONTENT_HERE
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoltyMarket - Prediction Markets</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg-primary: #0a0e17;
+            --color-bg-secondary: #141922;
+            --color-bg-tertiary: #1c2332;
+            --color-border: #2a3441;
+            --color-text-primary: #e8eaed;
+            --color-text-secondary: #9ca3af;
+            --color-text-muted: #6b7280;
+            --color-accent-green: #10b981;
+            --color-accent-green-hover: #059669;
+            --color-accent-blue: #3b82f6;
+            --color-accent-red: #ef4444;
+            --font-serif: 'Instrument Serif', serif;
+            --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Gradient Background Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-bg-primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 23, 0.8);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 34px;
+            font-weight: 400;
+            color: var(--color-text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        .logo-icon {
+            font-size: 38px;
+        }
+
+        /* Wallet Button */
+        .wallet-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            padding: 10px 20px;
+            border-radius: 24px;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .wallet-btn:hover {
+            border-color: var(--color-accent-green);
+            background: var(--color-bg-secondary);
+        }
+
+        .wallet-btn.connected {
+            border-color: var(--color-accent-green);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .wallet-btn.connected:hover {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .wallet-icon {
+            font-size: 18px;
+        }
+
+        .wallet-address {
+            color: var(--color-accent-green);
+            font-family: monospace;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: var(--font-serif);
+            font-size: 52px;
+            font-weight: 400;
+            margin-bottom: 16px;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--color-text-secondary);
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.1s backwards;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-size: 14px;
+            color: var(--color-accent-green);
+            margin-bottom: 24px;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        /* Stats Bar */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin: 60px 0;
+            animation: fadeInUp 0.8s ease-out 0.3s backwards;
+        }
+
+        .stat-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 32px 24px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--color-accent-green);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.1);
+        }
+
+        .stat-number {
+            font-family: var(--font-serif);
+            font-size: 48px;
+            font-weight: 400;
+            color: var(--color-accent-green);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Create Button */
+        .create-section {
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .btn-create {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--color-accent-green);
+            color: white;
+            padding: 16px 32px;
+            border-radius: var(--border-radius);
+            border: none;
+            font-family: var(--font-sans);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-create:hover {
+            background: var(--color-accent-green-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-create:active {
+            transform: translateY(0);
+        }
+
+        /* Markets Section */
+        .markets-section {
+            margin: 80px 0;
+        }
+
+        .section-header {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: 36px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 16px;
+        }
+
+        .markets-grid {
+            display: grid;
+            gap: 24px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .market-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            transition: var(--transition);
+        }
+
+        .market-card:hover {
+            border-color: var(--color-accent-green);
+        }
+
+        .market-header {
+            margin-bottom: 16px;
+        }
+
+        .market-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        .market-status.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--color-accent-green);
+        }
+
+        .market-status.ended {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--color-text-muted);
+        }
+
+        .market-question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .market-time {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            margin-bottom: 16px;
+        }
+
+        .voting-section {
+            margin: 20px 0;
+            padding: 16px;
+            background: var(--color-bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .vote-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .vote-btn {
+            padding: 16px;
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            font-family: var(--font-sans);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .vote-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .vote-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .vote-btn.yes {
+            border-color: var(--color-accent-green);
+        }
+
+        .vote-btn.yes:hover:not(:disabled) {
+            background: var(--color-accent-green);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+        }
+
+        .vote-btn.no {
+            border-color: var(--color-accent-red);
+        }
+
+        .vote-btn.no:hover:not(:disabled) {
+            background: var(--color-accent-red);
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.2);
+        }
+
+        .vote-percentage {
+            font-size: 24px;
+            font-family: var(--font-serif);
+        }
+
+        .vote-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .vote-count {
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        .market-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .market-volume {
+            font-size: 14px;
+            color: var(--color-text-muted);
+        }
+
+        .market-percentage {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--color-accent-green);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .modal-header {
+            margin-bottom: 32px;
+        }
+
+        .modal-title {
+            font-family: var(--font-serif);
+            font-size: 32px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            color: var(--color-text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: var(--font-sans);
+            font-size: 16px;
+            color: var(--color-text-primary);
+            transition: var(--transition);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--color-accent-green);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border-radius: 8px;
+            border: none;
+            font-family: var(--font-sans);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--color-accent-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-accent-green-hover);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--color-border);
+            color: var(--color-text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-bg-tertiary);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--color-border);
+            padding: 60px 0 40px;
+            margin-top: 120px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-family: var(--font-serif);
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+
+        .footer-text {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .donation-box {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .donation-label {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .address-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--color-bg-secondary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-accent-green);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: var(--transition);
+            font-size: 12px;
+        }
+
+        .copy-btn:hover {
+            background: var(--color-bg-tertiary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            font-size: 14px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state-title {
+            font-family: var(--font-serif);
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-text {
+            color: var(--color-text-secondary);
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 42px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 24px;
+            }
+
+            .modal-title {
+                font-size: 24px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-accent-green);
+            border-radius: 8px;
+            padding: 16px 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <span class="logo-icon">🦞</span>
+                    <span>MoltyMarket</span>
+                </a>
+                <button class="wallet-btn" id="walletBtn" onclick="connectWallet()">
+                    <span class="wallet-icon">🦊</span>
+                    <span id="walletBtnText">Connect Wallet</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-badge">
+                    <span>✓</span>
+                    <span>100% Free</span>
+                </div>
+                <h1>Prediction Markets<br>for Just About Anything</h1>
+                <p>Free Moltbook predictions and community drama</p>
+            </div>
+        </section>
+
+        <section class="container">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="predictionsCount">0</div>
+                    <div class="stat-label">Predictions Made</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="marketsCount">0</div>
+                    <div class="stat-label">Active Markets</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="predictorsCount">0</div>
+                    <div class="stat-label">Predictors</div>
+                </div>
+            </div>
+
+            <div class="create-section">
+                <button class="btn-create" id="createBtn">
+                    <span>+</span>
+                    <span>Create Your Prediction</span>
+                </button>
+            </div>
+
+            <div class="markets-section">
+                <div class="section-header">
+                    <h2 class="section-title">Active Markets</h2>
+                    <p class="section-subtitle">Explore and predict on community-created markets</p>
+                </div>
+                <div class="markets-grid" id="marketsGrid">
+                    <div class="loading">Loading markets...</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MoltyMarket</h3>
+                    <p class="footer-text">
+                        A free, community-driven prediction market platform for Moltbook predictions and community events.
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h3>Support Development</h3>
+                    <p class="footer-text">
+                        If you enjoy MoltyMarket, consider supporting with a small donation.
+                    </p>
+                    <div class="donation-box">
+                        <div class="donation-label">Ethereum / Base</div>
+                        <div class="address-display">
+                            <span id="ethAddress">0x700853FA56e12b7a250E62BeE19750fFEc0e61E1</span>
+                        </div>
+                        <button class="copy-btn" id="copyAddressBtn">Copy Address</button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Made by Neo • MoltyMarket © 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create Prediction</h2>
+                <p class="modal-subtitle">Set up your prediction market</p>
+            </div>
+            <form id="predictionForm">
+                <div class="form-group">
+                    <label class="form-label">Market Question</label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="questionInput"
+                        placeholder="Will X happen by Y date?"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description (Optional)</label>
+                    <textarea 
+                        class="form-textarea" 
+                        id="descriptionInput"
+                        placeholder="Add context or resolution criteria..."
+                    ></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">End Date</label>
+                    <input 
+                        type="datetime-local" 
+                        class="form-input" 
+                        id="endDateInput"
+                        required
+                    >
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        Create Market
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span>✓</span>
+        <span id="toastMessage"></span>
+    </div>
+
+    <script type="module">
+        // ============================================
+        // SUPABASE CONFIGURATION - Using REST API directly
+        // ============================================
+        const SUPABASE_URL = 'https://llpavjqrjlqyjsbdzllt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxscGF2anFyamxxeWpzYmR6bGx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMzYzNzgsImV4cCI6MjA4NTgxMjM3OH0.U44NtX46QULjNalTlxyTo9H8Zw1YTXOvqQMV-e_5YLc';
+        const REST_URL = `${SUPABASE_URL}/rest/v1`;
+
+        // Helper function to make Supabase REST API calls (avoids Headers cloning error)
+        async function supabaseRequest(table, options = {}) {
+            const { method = 'GET', body, select = '*', filters = [], order, count, single } = options;
+            
+            let url = `${REST_URL}/${table}?select=${encodeURIComponent(select)}`;
+            
+            // Add filters
+            filters.forEach(f => {
+                url += `&${f.column}=${f.operator}.${encodeURIComponent(f.value)}`;
+            });
+            
+            // Add ordering
+            if (order) {
+                url += `&order=${order.column}.${order.ascending ? 'asc' : 'desc'}`;
+            }
+            
+            const headers = {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': count ? 'count=exact' : (method === 'POST' ? 'return=representation' : '')
+            };
+            
+            const fetchOptions = { method, headers };
+            if (body) {
+                fetchOptions.body = JSON.stringify(body);
+            }
+            
+            const response = await fetch(url, fetchOptions);
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP ${response.status}`);
+            }
+            
+            // Get count from header if requested
+            const totalCount = response.headers.get('content-range')?.split('/')[1];
+            
+            // HEAD requests or count-only requests might have empty body
+            if (method === 'HEAD' || count) {
+                return { data: null, count: totalCount ? parseInt(totalCount) : 0 };
+            }
+            
+            const data = await response.json();
+            return { data: single ? data[0] : data, count: totalCount ? parseInt(totalCount) : null };
+        }
+
+        console.log('Supabase REST API configured successfully');
+
+        // ============================================
+        // DATA MANAGEMENT
+        // ============================================
+        let markets = [];
+        let stats = {
+            predictions: 0,
+            markets: 0,
+            predictors: 0
+        };
+
+        // Load markets from Supabase
+        async function loadMarkets() {
+            try {
+                console.log('Loading markets from:', `${REST_URL}/markets`);
+                
+                const response = await fetch(`${REST_URL}/markets?select=*&order=created_at.desc`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error:', response.status, errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Markets loaded:', data.length);
+
+                markets = data || [];
+                await updateStats();
+                renderMarkets();
+            } catch (error) {
+                console.error('Error loading markets:', error.message || error);
+                // Don't show toast on every refresh - only on first load
+                if (markets.length === 0) {
+                    showToast('Error loading markets - check console for details');
+                }
+            }
+        }
+
+        // Update statistics
+        async function updateStats() {
+            try {
+                // Count total markets
+                const marketsResponse = await fetch(`${REST_URL}/markets?select=id`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Prefer': 'count=exact'
+                    }
+                });
+                const marketsCount = parseInt(marketsResponse.headers.get('content-range')?.split('/')[1] || '0');
+
+                // Count total votes
+                const votesResponse = await fetch(`${REST_URL}/votes?select=id`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Prefer': 'count=exact'
+                    }
+                });
+                const votesCount = parseInt(votesResponse.headers.get('content-range')?.split('/')[1] || '0');
+
+                // Count unique voters
+                const { data: uniqueVoters } = await supabaseRequest('votes', {
+                    select: 'user_id'
+                });
+
+                const uniqueVotersCount = uniqueVoters ? 
+                    new Set(uniqueVoters.map(v => v.user_id)).size : 0;
+
+                stats = {
+                    predictions: votesCount || 0,
+                    markets: marketsCount || 0,
+                    predictors: uniqueVotersCount
+                };
+
+                document.getElementById('predictionsCount').textContent = stats.predictions;
+                document.getElementById('marketsCount').textContent = stats.markets;
+                document.getElementById('predictorsCount').textContent = stats.predictors;
+            } catch (error) {
+                console.error('Error updating stats:', error.message || error);
+            }
+        }
+
+        // Render markets
+        async function renderMarkets() {
+            const grid = document.getElementById('marketsGrid');
+            
+            if (markets.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <h3 class="empty-state-title">No active markets yet</h3>
+                        <p class="empty-state-text">Be the first to create a prediction market</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Get vote counts for all markets
+            const marketCards = await Promise.all(markets.map(async (market) => {
+                // Get votes for this market
+                const { data: votes } = await supabaseRequest('votes', {
+                    select: 'choice',
+                    filters: [{ column: 'market_id', operator: 'eq', value: market.id }]
+                });
+
+                const yesVotes = votes ? votes.filter(v => v.choice === 'yes').length : 0;
+                const noVotes = votes ? votes.filter(v => v.choice === 'no').length : 0;
+                const totalVotes = yesVotes + noVotes;
+
+                const yesPercentage = totalVotes > 0 ? Math.round((yesVotes / totalVotes) * 100) : 50;
+                const noPercentage = totalVotes > 0 ? Math.round((noVotes / totalVotes) * 100) : 50;
+
+                const endDate = new Date(market.end_date);
+                const now = new Date();
+                const isEnded = endDate <= now;
+                const timeRemaining = getTimeRemaining(endDate);
+
+                return `
+                    <div class="market-card">
+                        <div class="market-header">
+                            <span class="market-status ${isEnded ? 'ended' : 'active'}">
+                                ${isEnded ? 'Ended' : 'Active'}
+                            </span>
+                            <div class="market-question">${market.question}</div>
+                            ${market.description ? `<p class="footer-text" style="margin-bottom: 8px; font-size: 14px;">${market.description}</p>` : ''}
+                            <div class="market-time">
+                                ${isEnded ? 'Ended' : 'Ends'} ${timeRemaining}
+                            </div>
+                        </div>
+                        
+                        <div class="voting-section">
+                            <div class="vote-buttons">
+                                <button 
+                                    class="vote-btn yes" 
+                                    onclick="vote('${market.id}', 'yes')"
+                                    ${isEnded ? 'disabled' : ''}
+                                >
+                                    <span class="vote-percentage">${yesPercentage}%</span>
+                                    <span class="vote-label">Yes</span>
+                                    <span class="vote-count">${yesVotes} votes</span>
+                                </button>
+                                <button 
+                                    class="vote-btn no" 
+                                    onclick="vote('${market.id}', 'no')"
+                                    ${isEnded ? 'disabled' : ''}
+                                >
+                                    <span class="vote-percentage">${noPercentage}%</span>
+                                    <span class="vote-label">No</span>
+                                    <span class="vote-count">${noVotes} votes</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="market-footer">
+                            <span class="market-volume">${totalVotes} total predictions</span>
+                            <span class="market-percentage">${yesPercentage}% Yes</span>
+                        </div>
+                    </div>
+                `;
+            }));
+
+            grid.innerHTML = marketCards.join('');
+        }
+
+        // Get time remaining string
+        function getTimeRemaining(endDate) {
+            const now = new Date();
+            const diff = endDate - now;
+            
+            if (diff < 0) {
+                return formatDate(endDate);
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (days > 0) {
+                return `in ${days} day${days !== 1 ? 's' : ''}`;
+            } else if (hours > 0) {
+                return `in ${hours} hour${hours !== 1 ? 's' : ''}`;
+            } else if (minutes > 0) {
+                return `in ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+            } else {
+                return 'in less than a minute';
+            }
+        }
+
+        // Format date
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+        }
+
+        // ============================================
+        // WALLET CONNECTION
+        // ============================================
+        let connectedWallet = null;
+
+        // Check if wallet is already connected on page load
+        async function checkWalletConnection() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        connectedWallet = accounts[0].toLowerCase();
+                        updateWalletButton();
+                    }
+                } catch (error) {
+                    console.error('Error checking wallet connection:', error);
+                }
+
+                // Listen for account changes
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    if (accounts.length > 0) {
+                        connectedWallet = accounts[0].toLowerCase();
+                    } else {
+                        connectedWallet = null;
+                    }
+                    updateWalletButton();
+                });
+            }
+        }
+
+        // Connect wallet function - exposed to window for onclick
+        window.connectWallet = async function connectWallet() {
+            // If already connected, disconnect
+            if (connectedWallet) {
+                connectedWallet = null;
+                updateWalletButton();
+                showToast('Wallet disconnected');
+                return;
+            }
+
+            // Check if MetaMask or other wallet is installed
+            if (typeof window.ethereum === 'undefined') {
+                showToast('Please install MetaMask or another Web3 wallet');
+                window.open('https://metamask.io/download/', '_blank');
+                return;
+            }
+
+            try {
+                // Request account access
+                const accounts = await window.ethereum.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+                
+                if (accounts.length > 0) {
+                    connectedWallet = accounts[0].toLowerCase();
+                    updateWalletButton();
+                    showToast('Wallet connected!');
+                }
+            } catch (error) {
+                if (error.code === 4001) {
+                    showToast('Connection rejected by user');
+                } else {
+                    console.error('Error connecting wallet:', error);
+                    showToast('Error connecting wallet');
+                }
+            }
+        }
+
+        // Update wallet button UI
+        function updateWalletButton() {
+            const btn = document.getElementById('walletBtn');
+            const btnText = document.getElementById('walletBtnText');
+            
+            if (connectedWallet) {
+                const truncatedAddress = `${connectedWallet.slice(0, 6)}...${connectedWallet.slice(-4)}`;
+                btnText.innerHTML = `<span class="wallet-address">${truncatedAddress}</span>`;
+                btn.classList.add('connected');
+                btn.title = `Connected: ${connectedWallet}\nClick to disconnect`;
+            } else {
+                btnText.textContent = 'Connect Wallet';
+                btn.classList.remove('connected');
+                btn.title = 'Connect your Web3 wallet to vote';
+            }
+        }
+
+        // Get user ID (wallet address)
+        function getUserId() {
+            return connectedWallet;
+        }
+
+        // Check if user can vote
+        function canVote() {
+            if (!connectedWallet) {
+                showToast('Please connect your wallet to vote');
+                return false;
+            }
+            return true;
+        }
+
+        // Vote function - exposed to window for onclick handlers
+        window.vote = async function vote(marketId, choice) {
+            // Check wallet connection first
+            if (!canVote()) return;
+
+            try {
+                const market = markets.find(m => m.id === marketId);
+                if (!market) return;
+
+                const endDate = new Date(market.end_date);
+                if (endDate <= new Date()) {
+                    showToast('This market has ended!');
+                    return;
+                }
+
+                const userId = getUserId();
+
+                // Check if user already voted
+                const { data: existingVotes } = await supabaseRequest('votes', {
+                    filters: [
+                        { column: 'market_id', operator: 'eq', value: marketId },
+                        { column: 'user_id', operator: 'eq', value: userId }
+                    ]
+                });
+                
+                // Handle case where no vote exists (returns empty array)
+                const existingVote = existingVotes && existingVotes.length > 0 ? existingVotes[0] : null;
+
+                if (existingVote) {
+                    // Update existing vote using PATCH
+                    const response = await fetch(`${REST_URL}/votes?id=eq.${existingVote.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ choice })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to update vote');
+                    showToast('Vote updated!');
+                } else {
+                    // Insert new vote
+                    const response = await fetch(`${REST_URL}/votes`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
+                        },
+                        body: JSON.stringify({ market_id: marketId, user_id: userId, choice })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to insert vote');
+                    showToast(`Vote recorded: ${choice.toUpperCase()}!`);
+                }
+
+                // Reload markets to show updated counts
+                await loadMarkets();
+            } catch (error) {
+                console.error('Error voting:', error);
+                showToast('Error recording vote');
+            }
+        }
+
+        // Modal functions - exposed to window for onclick handlers
+        window.openModal = function openModal() {
+            document.getElementById('createModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        window.closeModal = function closeModal() {
+            document.getElementById('createModal').classList.remove('active');
+            document.body.style.overflow = '';
+            document.getElementById('predictionForm').reset();
+        }
+
+        // Handle form submission
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            
+            try {
+                const question = document.getElementById('questionInput').value;
+                const description = document.getElementById('descriptionInput').value;
+                const endDate = document.getElementById('endDateInput').value;
+                
+                if (new Date(endDate) <= new Date()) {
+                    showToast('End date must be in the future!');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Create Market';
+                    return;
+                }
+
+                const response = await fetch(`${REST_URL}/markets`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify({
+                        question,
+                        description,
+                        end_date: endDate,
+                        created_at: new Date().toISOString()
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Failed to create market');
+                }
+
+                await loadMarkets();
+                closeModal();
+                showToast('Market created successfully!');
+            } catch (error) {
+                console.error('Error creating market:', error);
+                showToast('Error creating market');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Market';
+            }
+        });
+
+        // Copy address function - exposed to window for onclick handlers
+        window.copyAddress = function copyAddress() {
+            const address = document.getElementById('ethAddress').textContent;
+            navigator.clipboard.writeText(address).then(() => {
+                showToast('Address copied to clipboard!');
+            });
+        }
+
+        // Toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Close modal on outside click
+        document.getElementById('createModal').addEventListener('click', (e) => {
+            if (e.target.id === 'createModal') {
+                closeModal();
+            }
+        });
+        
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('createModal').classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Initialize
+        async function init() {
+            // Add event listeners after DOM is ready
+            document.getElementById('createBtn').addEventListener('click', openModal);
+            document.getElementById('cancelBtn').addEventListener('click', closeModal);
+            document.getElementById('copyAddressBtn').addEventListener('click', copyAddress);
+            
+            // Check if wallet is already connected
+            await checkWalletConnection();
+            
+            await loadMarkets();
+            
+            // Refresh markets every 10 seconds to show new predictions/votes
+            setInterval(() => {
+                loadMarkets();
+            }, 10000);
+            
+            // Update time remaining display every minute
+            setInterval(() => {
+                renderMarkets();
+            }, 60000);
+            
+            // Set minimum date for end date input to now
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('endDateInput').min = now.toISOString().slice(0, 16);
+        }
+
+        init();
+    </script>
+</body>
+</html>
